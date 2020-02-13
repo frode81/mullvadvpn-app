@@ -95,10 +95,7 @@ bool PermitTunnelDns::apply(IObjectInstaller &objectInstaller)
 		for (const auto &host : m_v6DnsHosts)
 		{
 			// Multiple conditions of same type are OR'ed
-			if (wfp::IpAddress::Ipv6 == host.type())
-			{
-				conditionBuilder.add_condition(ConditionIp::Remote(host));
-			}
+			conditionBuilder.add_condition(ConditionIp::Remote(host));
 		}
 
 		conditionBuilder.add_condition(ConditionPort::Remote(DNS_PORT));

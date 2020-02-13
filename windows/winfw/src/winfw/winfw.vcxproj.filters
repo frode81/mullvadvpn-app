@@ -46,6 +46,9 @@
     <ClCompile Include="rules\permittunneldns.cpp">
       <Filter>rules</Filter>
     </ClCompile>
+    <ClCompile Include="rules\blockdns.cpp">
+      <Filter>rules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -97,6 +100,9 @@
       <Filter>rules</Filter>
     </ClInclude>
     <ClInclude Include="rules\permittunneldns.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\blockdns.h">
       <Filter>rules</Filter>
     </ClInclude>
   </ItemGroup>

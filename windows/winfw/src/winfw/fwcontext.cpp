@@ -11,6 +11,7 @@
 #include "rules/permitlanservice.h"
 #include "rules/permitloopback.h"
 #include "rules/permittunneldns.h"
+#include "rules/blockdns.h"
 #include "rules/permitvpnrelay.h"
 #include "rules/permitvpntunnel.h"
 #include "rules/permitvpntunnelservice.h"
@@ -148,6 +149,22 @@ bool FwContext::applyPolicyConnected
 	Ruleset ruleset;
 
 	AppendNetBlockedRules(ruleset);
+
+	std::vector<wfp::IpAddress> dnsHosts;
+	dnsHosts.push_back(wfp::IpAddress(v4DnsHost));
+
+	if (nullptr != v6DnsHost)
+	{
+		dnsHosts.push_back(wfp::IpAddress(v6DnsHost));
+	}
+
+	ruleset.emplace_back(std::make_unique<rules::PermitTunnelDns>(
+		tunnelInterfaceAlias,
+		dnsHosts
+	));
+
+	ruleset.emplace_back(std::make_unique<rules::BlockDns>());
+
 	AppendSettingsRules(ruleset, settings);
 
 	ruleset.emplace_back(std::make_unique<rules::PermitVpnRelay>(
@@ -162,19 +179,6 @@ bool FwContext::applyPolicyConnected
 
 	ruleset.emplace_back(std::make_unique<rules::PermitVpnTunnelService>(
 		tunnelInterfaceAlias
-	));
-
-	std::vector<wfp::IpAddress> dnsHosts;
-	dnsHosts.push_back(wfp::IpAddress(v4DnsHost));
-
-	if (nullptr != v6DnsHost)
-	{
-		dnsHosts.push_back(wfp::IpAddress(v6DnsHost));
-	}
-
-	ruleset.emplace_back(std::make_unique<rules::PermitTunnelDns>(
-		tunnelInterfaceAlias,
-		dnsHosts
 	));
 
 	return applyRuleset(ruleset);

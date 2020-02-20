@@ -167,9 +167,10 @@
 	Push $1
 
 	#
-	# Remove the old-ID Mullvad TAP, if it exists
+	# Remove old TAPs, if they exist
 	#
 	${RemoveVanillaTap}
+	${RemoveBrandedTap}
 
 	#
 	# Silently approve the certificate before installing the driver
@@ -724,12 +725,12 @@
 
 	${RemoveCLIFromEnvironPath}
 
-	# Remove the TAP adapter
-	${ExtractTapDriver}
-	${RemoveBrandedTap}
-
 	# If not ran silently
 	${If} $FullUninstall == 1
+		# Remove the TAP adapter
+		${ExtractTapDriver}
+		${RemoveBrandedTap}
+
 		# Remove Wintun
 		${ExtractWintun}
 		${RemoveWintun}

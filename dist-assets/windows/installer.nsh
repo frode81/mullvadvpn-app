@@ -103,9 +103,25 @@
 	Push $0
 	Push $1
 
+	log::Log "RemoveBrandedTap()"
+
 	nsExec::ExecToStack '"$TEMP\tap-driver\driverlogic.exe" remove ${TAP_HARDWARE_ID}'
 	Pop $0
 	Pop $1
+
+	${If} $0 == ${DL_GENERAL_ERROR}
+		StrCpy $R0 "Failed to remove TAP adapter"
+		log::LogWithDetails $R0 $1
+
+		Goto RemoveBrandedTap_return
+	${EndIf}
+
+	log::Log "RemoveBrandedTap() completed successfully"
+
+	RemoveBrandedTap_return:
+
+	Push 0
+	Pop $R0
 
 	Pop $1
 	Pop $0

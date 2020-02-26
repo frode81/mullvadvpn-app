@@ -200,6 +200,15 @@ pub enum DaemonCommand {
     /// Remove settings and clear the cache
     #[cfg(not(target_os = "android"))]
     FactoryReset(oneshot::Sender<()>),
+    /// Request list of processes excluded from the tunnel
+    #[cfg(unix)]
+    GetSplitTunnelProcesses(oneshot::Sender<Vec<i32>>),
+    /// Exclude traffic of a process (PID) from the tunnel
+    #[cfg(unix)]
+    AddSplitTunnelProcess(oneshot::Sender<()>, i32),
+    /// Remove process (PID) from list of processes excluded from the tunnel
+    #[cfg(unix)]
+    RemoveSplitTunnelProcess(oneshot::Sender<()>, i32),
     /// Makes the daemon exit the main loop and quit.
     Shutdown,
 }
@@ -899,6 +908,12 @@ where
             GetCurrentVersion(tx) => self.on_get_current_version(tx),
             #[cfg(not(target_os = "android"))]
             FactoryReset(tx) => self.on_factory_reset(tx),
+            #[cfg(unix)]
+            GetSplitTunnelProcesses(tx) => self.on_get_split_tunnel_processes(tx),
+            #[cfg(unix)]
+            AddSplitTunnelProcess(tx, pid) => self.on_add_split_tunnel_process(tx, pid),
+            #[cfg(unix)]
+            RemoveSplitTunnelProcess(tx, pid) => self.on_remove_split_tunnel_process(tx, pid),
             Shutdown => self.trigger_shutdown_event(),
         }
     }
@@ -1255,6 +1270,24 @@ where
                 Self::oneshot_send(tx, (), "factory_reset response");
             }
         }));
+    }
+
+    #[cfg(unix)]
+    fn on_get_split_tunnel_processes(&mut self, tx: oneshot::Sender<Vec<i32>>) {
+        // TODO
+        Self::oneshot_send(tx, Vec::new(), "get_split_tunnel_processes response")
+    }
+
+    #[cfg(unix)]
+    fn on_add_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
+        // TODO
+        Self::oneshot_send(tx, (), "add_split_tunnel_process response")
+    }
+
+    #[cfg(unix)]
+    fn on_remove_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
+        // TODO
+        Self::oneshot_send(tx, (), "remove_split_tunnel_process response")
     }
 
     fn on_update_relay_settings(&mut self, tx: oneshot::Sender<()>, update: RelaySettingsUpdate) {

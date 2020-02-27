@@ -55,6 +55,7 @@ use std::{
 };
 use talpid_core::{
     mpsc::Sender,
+    split,
     tunnel_state_machine::{self, TunnelCommand, TunnelParametersGenerator},
 };
 #[cfg(target_os = "android")]
@@ -1274,23 +1275,31 @@ where
 
     #[cfg(unix)]
     fn on_get_split_tunnel_processes(&mut self, tx: oneshot::Sender<Vec<i32>>) {
-        // TODO
         log::debug!("FIXME: on_get_split_tunnel_processes");
-        Self::oneshot_send(tx, Vec::new(), "get_split_tunnel_processes response")
+        match split::list_pids() {
+            Ok(pids) => Self::oneshot_send(tx, pids, "get_split_tunnel_processes response"),
+            Err(e) => error!("{}", e.display_chain_with_msg("Unable to obtain PIDs")),
+        }
     }
 
     #[cfg(unix)]
     fn on_add_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
         log::debug!("FIXME: on_add_split_tunnel_process");
-        Self::oneshot_send(tx, (), "add_split_tunnel_process response")
+        match split::add_pid(pid) {
+            Ok(()) => Self::oneshot_send(tx, (), "add_split_tunnel_process response"),
+            Err(e) => error!("{}", e.display_chain_with_msg("Unable to add PID")),
+        }
     }
 
     #[cfg(unix)]
     fn on_remove_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
         log::debug!("FIXME: on_remove_split_tunnel_process");
-        Self::oneshot_send(tx, (), "remove_split_tunnel_process response")
+        match split::remove_pid(pid) {
+            Ok(()) => Self::oneshot_send(tx, (), "remove_split_tunnel_process response"),
+            Err(e) => error!("{}", e.display_chain_with_msg("Unable to remove PID")),
+        }
     }
 
     fn on_update_relay_settings(&mut self, tx: oneshot::Sender<()>, update: RelaySettingsUpdate) {

@@ -1,4 +1,5 @@
-use crate::{Command, Result};
+use crate::{new_rpc_client, Command, Result};
+use clap::value_t_or_exit;
 
 pub struct Split;
 
@@ -41,15 +42,23 @@ impl Split {
     fn handle_pid_cmd(matches: &clap::ArgMatches<'_>) -> Result<()> {
         match matches.subcommand() {
             ("add", Some(matches)) => {
-                // TODO
+                let pid = value_t_or_exit!(matches.value_of("pid"), i32);
+                new_rpc_client()?.add_split_tunnel_process(pid)?;
                 Ok(())
             }
             ("delete", Some(matches)) => {
-                // TODO
+                let pid = value_t_or_exit!(matches.value_of("pid"), i32);
+                new_rpc_client()?.remove_split_tunnel_process(pid)?;
                 Ok(())
             }
-            ("list", Some(matches)) => {
-                // TODO
+            ("list", Some(_)) => {
+                let pids = new_rpc_client()?.get_split_tunnel_processes()?;
+                println!("Excluded PIDs:");
+
+                for pid in pids.iter() {
+                    println!("    {}", pid);
+                }
+
                 Ok(())
             }
             _ => unreachable!("unhandled command"),

@@ -8,7 +8,9 @@ import SubmittableTextInput from './SubmittableTextInput';
 interface IRedeemVoucherProps {
   submitVoucher: (voucherCode: string) => Promise<VoucherResponse>;
   updateAccountExpiry: (expiry: string) => void;
+  onSubmit?: () => void;
   onSuccess?: () => void;
+  onFailure?: () => void;
 }
 
 interface IRedeemVoucherState {
@@ -50,6 +52,10 @@ export default class RedeemVoucher extends Component<IRedeemVoucherProps, IRedee
       return;
     }
 
+    if (this.props.onSubmit) {
+      this.props.onSubmit();
+    }
+
     const response = await this.props.submitVoucher(this.state.inputValue);
 
     if (response.type === 'success') {
@@ -60,6 +66,9 @@ export default class RedeemVoucher extends Component<IRedeemVoucherProps, IRedee
       }
     } else {
       this.setState({ response });
+      if (this.props.onFailure) {
+        this.props.onFailure();
+      }
     }
   };
 }

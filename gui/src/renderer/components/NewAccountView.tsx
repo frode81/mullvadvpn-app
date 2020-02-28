@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Component, Text, View } from 'reactxp';
 import { links } from '../../config.json';
+import AccountExpiry from '../../shared/account-expiry';
 import { AccountToken } from '../../shared/daemon-rpc-types';
 import { messages } from '../../shared/gettext';
 import RedeemVoucherContainer from '../containers/RedeemVoucherContainer';
@@ -11,6 +12,10 @@ import { ModalAlert } from './Modal';
 
 interface INewAccountViewProps {
   accountToken?: AccountToken;
+  accountExpiry?: AccountExpiry;
+  updateAccountData: () => void;
+  hideWelcomeView: () => void;
+  onExternalLinkWithAuth: (url: string) => Promise<void>;
 }
 
 interface INewAccountViewState {

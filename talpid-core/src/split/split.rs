@@ -1,3 +1,4 @@
+use talpid_types::ErrorExt;
 use std::{
     fs,
     io::{self, BufRead, BufReader, Write},
@@ -61,6 +62,8 @@ fn add_pid(pid: i32) -> Result<(), Error> {
 
     Ok(())
 }
+
+// TODO: remove pids
 
 fn list_pids(pid: i32) -> Result<Vec<i32>, Error> {
     // TODO: manage child PIDs somehow?

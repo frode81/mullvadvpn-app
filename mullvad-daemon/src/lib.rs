@@ -1275,18 +1275,21 @@ where
     #[cfg(unix)]
     fn on_get_split_tunnel_processes(&mut self, tx: oneshot::Sender<Vec<i32>>) {
         // TODO
+        log::debug!("FIXME: on_get_split_tunnel_processes");
         Self::oneshot_send(tx, Vec::new(), "get_split_tunnel_processes response")
     }
 
     #[cfg(unix)]
     fn on_add_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
+        log::debug!("FIXME: on_add_split_tunnel_process");
         Self::oneshot_send(tx, (), "add_split_tunnel_process response")
     }
 
     #[cfg(unix)]
     fn on_remove_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
+        log::debug!("FIXME: on_remove_split_tunnel_process");
         Self::oneshot_send(tx, (), "remove_split_tunnel_process response")
     }
 

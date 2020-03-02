@@ -205,16 +205,16 @@ pub enum DaemonCommand {
     #[cfg(not(target_os = "android"))]
     FactoryReset(oneshot::Sender<()>),
     /// Request list of processes excluded from the tunnel
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     GetSplitTunnelProcesses(oneshot::Sender<Vec<i32>>),
     /// Exclude traffic of a process (PID) from the tunnel
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     AddSplitTunnelProcess(oneshot::Sender<()>, i32),
     /// Remove process (PID) from list of processes excluded from the tunnel
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     RemoveSplitTunnelProcess(oneshot::Sender<()>, i32),
     /// Clear list of processes excluded from the tunnel
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     ClearSplitTunnelProcesses(oneshot::Sender<()>),
     /// Makes the daemon exit the main loop and quit.
     Shutdown,
@@ -432,6 +432,7 @@ pub struct Daemon<L: EventListener> {
     tunnel_state: TunnelState,
     target_state: TargetState,
     state: DaemonExecutionState,
+    #[cfg(target_os = "linux")]
     exclude_pids: split::PidManager,
     rx: Wait<UnboundedReceiver<InternalDaemonEvent>>,
     tx: DaemonEventSender,
@@ -541,6 +542,7 @@ where
             tunnel_state: TunnelState::Disconnected,
             target_state: TargetState::Unsecured,
             state: DaemonExecutionState::Running,
+            #[cfg(target_os = "linux")]
             exclude_pids: split::PidManager::new().map_err(Error::InitSplitTunneling)?,
             rx: internal_event_rx.wait(),
             tx: internal_event_tx,
@@ -917,13 +919,13 @@ where
             GetCurrentVersion(tx) => self.on_get_current_version(tx),
             #[cfg(not(target_os = "android"))]
             FactoryReset(tx) => self.on_factory_reset(tx),
-            #[cfg(unix)]
+            #[cfg(target_os = "linux")]
             GetSplitTunnelProcesses(tx) => self.on_get_split_tunnel_processes(tx),
-            #[cfg(unix)]
+            #[cfg(target_os = "linux")]
             AddSplitTunnelProcess(tx, pid) => self.on_add_split_tunnel_process(tx, pid),
-            #[cfg(unix)]
+            #[cfg(target_os = "linux")]
             RemoveSplitTunnelProcess(tx, pid) => self.on_remove_split_tunnel_process(tx, pid),
-            #[cfg(unix)]
+            #[cfg(target_os = "linux")]
             ClearSplitTunnelProcesses(tx) => self.on_clear_split_tunnel_processes(tx),
             Shutdown => self.trigger_shutdown_event(),
         }
@@ -1283,7 +1285,7 @@ where
         }));
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     fn on_get_split_tunnel_processes(&mut self, tx: oneshot::Sender<Vec<i32>>) {
         log::debug!("FIXME: on_get_split_tunnel_processes");
         match self.exclude_pids.list() {
@@ -1292,7 +1294,7 @@ where
         }
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     fn on_add_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
         log::debug!("FIXME: on_add_split_tunnel_process");
@@ -1302,7 +1304,7 @@ where
         }
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     fn on_remove_split_tunnel_process(&mut self, tx: oneshot::Sender<()>, pid: i32) {
         // TODO
         log::debug!("FIXME: on_remove_split_tunnel_process");
@@ -1312,7 +1314,7 @@ where
         }
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     fn on_clear_split_tunnel_processes(&mut self, tx: oneshot::Sender<()>) {
         match self.exclude_pids.clear() {
             Ok(()) => Self::oneshot_send(tx, (), "clear_split_tunnel_processes response"),

@@ -4,7 +4,6 @@ use std::{
     fs,
     io::{self, BufRead, BufReader, BufWriter, Write},
     net::IpAddr,
-    num,
     path::PathBuf,
     process::Command,
     str::FromStr,

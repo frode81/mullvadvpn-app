@@ -38,6 +38,12 @@ enum DeferReasonError: Error {
     case server(MullvadAPI.ResponseError)
 }
 
+/// A response received when sending the AppStore receipt to the backend
+struct SendAppStoreReceiptResponse: Codable {
+    let timeAdded: TimeInterval
+    let newExpiry: Date
+}
+
 class MullvadAPI {
     private let session: URLSession
 
@@ -167,6 +173,15 @@ class MullvadAPI {
         let request = JsonRpcRequest(method: "remove_wg_key", params: [
             AnyEncodable(accountToken),
             AnyEncodable(publicKey)
+        ])
+
+        return MullvadAPI.makeDataTaskPublisher(request: request)
+    }
+
+    func sendAppStoreReceipt(accountToken: String, receiptData: Data) -> AnyPublisher<Response<SendAppStoreReceiptResponse>, MullvadAPI.Error> {
+        let request = JsonRpcRequest(method: "apple_payment", params: [
+            AnyEncodable(accountToken),
+            AnyEncodable(receiptData)
         ])
 
         return MullvadAPI.makeDataTaskPublisher(request: request)

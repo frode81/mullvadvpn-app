@@ -6,11 +6,15 @@
 //  Copyright © 2020 Mullvad VPN AB. All rights reserved.
 //
 
+import Combine
 import Foundation
 import StoreKit
 import os
 
-class StoreTransactionQueue: NSObject, SKPaymentTransactionObserver {
+class AppStorePaymentManager: NSObject, SKPaymentTransactionObserver {
+
+    /// A shared instance of `AppStorePaymentManager`
+    static let shared = AppStorePaymentManager(queue: SKPaymentQueue.default())
 
     private let queue: SKPaymentQueue
 
@@ -21,6 +25,8 @@ class StoreTransactionQueue: NSObject, SKPaymentTransactionObserver {
 
         queue.add(self)
     }
+
+    // MARK: - SKPaymentTransactionObserver
 
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
